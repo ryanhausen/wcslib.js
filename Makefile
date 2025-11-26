@@ -5,10 +5,6 @@ ifeq ($(strip $(shell command -v emcc 2>/dev/null)),)
 $(error emcc not found in PATH. Install Emscripten and/or add 'emcc' to your PATH.)
 endif
 
-# EMCC  = $(EMSDK)/upstream/emscripten/emcc
-# EMCONFIGURE = $(EMSDK)/upstream/emscripten/emconfigure
-# EMMAKE = $(EMSDK)/upstream/emscripten/emmake
-
 WCSLIB_DIR = wcslib
 # Pick up whichever libwcs-<version>.a the build produced
 WCSLIB_LIB = $(WCSLIB_DIR)/C/libwcs-*.a
@@ -16,6 +12,7 @@ WCSLIB_INC = -I $(WCSLIB_DIR)/C -I $(WCSLIB_DIR)
 
 WRAPPER = wrapper.c
 OUTDIR = build
+# The file output is dynamic based on WCSLIB version, so we use a flag file to indicate completion
 COMPLETED_FLAG = $(OUTDIR)/.completed
 
 # WCSLIB functions to export
@@ -46,7 +43,11 @@ $(WCSLIB_LIB): $(WCSLIB_DIR)/GNUmakefile
 
 # Step 3: link wrapper + libwcs into WASM
 $(COMPLETED_FLAG): $(WRAPPER) $(WCSLIB_LIB)
-	WCSLIB_A="$(firstword $(wildcard $(WCSLIB_LIB)))"; \
+	WCSLIB_A=""; \
+	for lib in $(WCSLIB_LIB); do \
+		WCSLIB_A="$$lib"; \
+		break; \
+	done; \
 	WCSLIB_BASE="$${WCSLIB_A##*/}"; \
 	WCSLIB_VER="$${WCSLIB_BASE#libwcs-}"; \
 	WCSLIB_VER="$${WCSLIB_VER%.a}"; \
