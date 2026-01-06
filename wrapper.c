@@ -30,8 +30,9 @@ int pix2sky(double x, double y, double *ra, double *dec) {
     int status = 0;
     double imgcrd[2], phi, theta, world[2];
     double pixcrd[2] = {x, y};
+    int stat;
 
-    status = wcsp2s(wcs, 1, 2, pixcrd, imgcrd, &phi, &theta, world, NULL);
+    status = wcsp2s(wcs, 1, 2, pixcrd, imgcrd, &phi, &theta, world, &stat);
     if (status == 0) {
         *ra  = world[0];
         *dec = world[1];
@@ -43,8 +44,9 @@ int sky2pix(double ra, double dec, double *x, double *y) {
     int status = 0;
     double world[2] = {ra, dec};
     double imgcrd[2], phi, theta, pixcrd[2];
+    int stat;
 
-    status = wcss2p(wcs, 1, 2, world, imgcrd, &phi, &theta, pixcrd, NULL);
+    status = wcss2p(wcs, 1, 2, world, &phi, &theta, imgcrd, pixcrd, &stat);
     if (status == 0) {
         *x = pixcrd[0];
         *y = pixcrd[1];
