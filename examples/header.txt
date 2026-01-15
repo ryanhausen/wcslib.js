@@ -1,0 +1,23 @@
+SIMPLE  =                    T / Fits Standard                                  
+BITPIX  =                  -32 / Bits per pixel                                 
+NAXIS   =                    2 / Number of axes                                 
+NAXIS1  =                 1586 / Axis Length                                    
+NAXIS2  =                 1028 / Axis Length                                    
+WCSAXES =                    2 / Number of WCS axes                             
+CRPIX1  =         -5663.231139 / Reference pixel on axis 1                      
+CRPIX2  =          3136.836242 / Reference pixel on axis 2                      
+CRVAL1  =    53.12279008101757 / Value at ref. pixel on axis 1                  
+CRVAL2  =   -27.80516715572271 / Value at ref. pixel on axis 2                  
+CTYPE1  = 'RA---TAN'           / Type of co-ordinate on axis 1                  
+CTYPE2  = 'DEC--TAN'           / Type of co-ordinate on axis 2                  
+CDELT1  =        -6.9432275E-6 / Pixel size on axis 1                           
+CDELT2  =  6.9432275000647964E-6 / Pixel size on axis 2                         
+MJD-OBS =   59861.354433310386 / Modified Julian Date of observation            
+DATE-OBS= '2022-10-09T08:30:23.038' / Date of observation                       
+RADESYS = 'FK5     '           / Reference frame for RA/DEC values              
+EQUINOX =               2000.0 / [yr] Epoch of reference equinox                
+OBSGEO-X=   1113701624.9663944 / [m] Observatory geocentric X                   
+OBSGEO-Y=   243480373.11775935 / [m] Observatory geocentric Y                   
+OBSGEO-Z=    497764690.1921221 / [m] Observatory geocentric Z                   
+END                                                                             
+

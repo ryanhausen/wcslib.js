@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wcslib.js Demo - Coordinate Translation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1><span>wcslib.js</span> Coordinate Translation</h1>
+        <p class="subtitle">WebAssembly-powered WCS coordinate transformations in the browser</p>
+    </div>
+
+    <div class="info">
+        <strong>About:</strong> This demo uses <code>wcslib.js</code> (a JS/WebAssembly transpilation of
+        <a href="https://www.atnf.csiro.au/computing/software/wcs/">WCSLIB</a> using
+        <a href="https://emscripten.org/index.html">emscripten</a>) to convert between
+        pixel coordinates and sky coordinates (RA/Dec) using the WCS information from a JWST NIRCam FITS header.
+        Click on the image to see the sky coordinates, or enter values manually below. The source image is a crop of the
+        F150W band from GOODS-S field from the <a href="https://jades-survey.github.io/">JADES</a> survey, downloaded from
+        <a href="https://archive.stsci.edu/hlsp/jades">MAST</a>.
+    </div>
+
+    <div id="status" class="status loading">Loading wcslib.js...</div>
+
+    <div class="container">
+        <div class="panel">
+            <h2><span class="icon">📷</span> Image View</h2>
+            <p class="panel-description">Click anywhere on the image to get sky coordinates</p>
+            <div class="image-wrapper">
+                <div class="image-container" id="imageContainer">
+                    <img src="hlsp_jades_jwst_nircam_goods-s-deep_f150w_v2.0_drz_crop.png" alt="JWST NIRCam Image" id="fitsImage">
+                    <div class="crosshair" id="crosshair" style="display: none;">
+                        <div class="crosshair-h"></div>
+                        <div class="crosshair-v"></div>
+                    </div>
+                </div>
+                <div class="coord-display" id="coordDisplay" style="display: none;"></div>
+            </div>
+            <div class="result" id="clickResult" style="display: none;">
+                <div class="row">
+                    <div>
+                        <div class="result-label">Pixel X</div>
+                        <div class="result-value" id="clickPixX">-</div>
+                    </div>
+                    <div>
+                        <div class="result-label">Pixel Y</div>
+                        <div class="result-value" id="clickPixY">-</div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 12px;">
+                    <div>
+                        <div class="result-label">RA (deg)</div>
+                        <div class="result-value" id="clickRA">-</div>
+                    </div>
+                    <div>
+                        <div class="result-label">Dec (deg)</div>
+                        <div class="result-value" id="clickDec">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wcs-section">
+                <div class="wcs-section-title">WCS Header Info</div>
+                <table class="wcs-table">
+                    <tbody>
+                        <tr><td>CRPIX1</td><td id="wcs-crpix1">-</td><td>CRPIX2</td><td id="wcs-crpix2">-</td></tr>
+                        <tr><td>CRVAL1 (RA)</td><td id="wcs-crval1">-</td><td>CRVAL2 (Dec)</td><td id="wcs-crval2">-</td></tr>
+                        <tr><td>CTYPE1</td><td id="wcs-ctype1">-</td><td>CTYPE2</td><td id="wcs-ctype2">-</td></tr>
+                        <tr><td>CDELT1</td><td id="wcs-cdelt1">-</td><td>CDELT2</td><td id="wcs-cdelt2">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2><span class="icon">🔄</span> Coordinate Converter</h2>
+            <p class="panel-description">Convert between pixel and sky coordinates</p>
+
+            <div class="converter-section">
+                <h3 class="converter-title">Pixel → Sky</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="pixX">Pixel X</label>
+                        <input type="number" id="pixX" value="500" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="pixY">Pixel Y</label>
+                        <input type="number" id="pixY" value="500" step="0.1">
+                    </div>
+                </div>
+                <button id="pix2skyBtn" disabled>Convert to Sky Coordinates</button>
+                <div class="result">
+                    <div class="row">
+                        <div>
+                            <div class="result-label">RA (degrees)</div>
+                            <div class="result-value" id="raResult">-</div>
+                        </div>
+                        <div>
+                            <div class="result-label">Dec (degrees)</div>
+                            <div class="result-value" id="decResult">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="converter-divider"></div>
+
+            <div class="converter-section">
+                <h3 class="converter-title">Sky → Pixel</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="raInput">RA (degrees)</label>
+                        <input type="number" id="raInput" value="53.0744033821" step="0.0001">
+                    </div>
+                    <div class="form-group">
+                        <label for="decInput">Dec (degrees)</label>
+                        <input type="number" id="decInput" value="-27.8234668751" step="0.0001">
+                    </div>
+                </div>
+                <button id="sky2pixBtn" disabled>Convert to Pixel Coordinates</button>
+                <div class="result">
+                    <div class="row">
+                        <div>
+                            <div class="result-label">Pixel X</div>
+                            <div class="result-value" id="xResult">-</div>
+                        </div>
+                        <div>
+                            <div class="result-label">Pixel Y</div>
+                            <div class="result-value" id="yResult">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
