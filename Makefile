@@ -20,7 +20,11 @@ EXPORTED = '["_getWcs","_pix2sky","_sky2pix","_malloc","_free"]'
 # Additional runtime methods to export
 EXTRA_EXPORTED = '["HEAPU8", "stringToUTF8","lengthBytesUTF8","UTF8ToString","getValue"]'
 
-.PHONY: all clean
+# Variables for the site target (evaluated when used)
+WCS_JS = $(notdir $(firstword $(wildcard $(OUTDIR)/wcslib-*.js)))
+WCS_VERSION = $(patsubst wcslib-%.js,%,$(WCS_JS))
+
+.PHONY: all clean site
 
 all: $(COMPLETED_FLAG)
 
@@ -61,6 +65,18 @@ $(COMPLETED_FLAG): $(WRAPPER) $(WCSLIB_LIB)
 		-s EXPORTED_RUNTIME_METHODS=$(EXTRA_EXPORTED); \
 	rm -f $(COMPLETED_FLAG); \
 	touch $(COMPLETED_FLAG)
+
+
+# Optional: setup the example website
+site: $(COMPLETED_FLAG)
+	cp $(OUTDIR)/wcslib-*.js examples/jwst/
+	cp $(OUTDIR)/wcslib-*.wasm examples/jwst/
+	@echo "WCS_JS: $(WCS_JS)"
+	@echo "WCSLIB version: $(WCS_VERSION)"
+	sed -i 's/VERSION/$(WCS_VERSION)/g' examples/jwst/main.js
+
+
+
 
 # Cleanup
 clean:
