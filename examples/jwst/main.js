@@ -127,7 +127,7 @@ async function initWCS() {
     try {
         // Load the wcslib.js module
         const script = document.createElement('script');
-        script.src = '../build/wcslib-8.5.js';
+        script.src = '../build/wcslib-VERSION.js';
 
         await new Promise((resolve, reject) => {
             script.onload = resolve;
