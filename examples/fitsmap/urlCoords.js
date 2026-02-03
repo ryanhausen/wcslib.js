@@ -167,7 +167,7 @@ function panFromUrl(map){
     console.log('ra',ra)
     console.log('dec',dec)
     console.log('zoom',zoom)
-    if (ra != null & dec != null){
+    if (ra != null && dec != null){
         panToSky([parseFloat(ra), parseFloat(dec)],
                  (zoom != null) ? parseInt(zoom) : default_zoom,
                  map);
