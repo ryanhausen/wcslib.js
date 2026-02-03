@@ -1,4 +1,4 @@
-// This global variable hold the current WCSSession instance
+// This global variable holds the current WCSSession instance
 let wcsSession = null;
 const INIT_ERROR = "WCSLIB not initialized";
 const ORIGIN = 1;
