@@ -1,3 +1,5 @@
 build/
 wcslib/
 wcslib.tar.bz2
+examples/jwst/wcslib-*.js
+examples/jwst/wcslib-*.wasm

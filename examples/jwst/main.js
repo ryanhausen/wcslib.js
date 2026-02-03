@@ -1,3 +1,9 @@
+// Important: Replace VERSION with actual version during build process
+// look for the line:
+// script.src = 'wcslib-VERSION.js';
+//
+
+
 // wcslib.js wrapper functions
 let wcsReady = false;
 // Image scale factor (the displayed image is a crop/scaled version of the full mosaic)
@@ -127,7 +133,7 @@ async function initWCS() {
     try {
         // Load the wcslib.js module
         const script = document.createElement('script');
-        script.src = '../build/wcslib-VERSION.js';
+        script.src = 'wcslib-VERSION.js';
 
         await new Promise((resolve, reject) => {
             script.onload = resolve;
