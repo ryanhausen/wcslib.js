@@ -134,7 +134,7 @@ function pixToSky(xy){
         x = xy.lng;
         y = xy.lat;
     } else {
-        x= xy[0];
+        x = xy[0];
         y= xy[1];
     }
     const res = wcsSession.pixToSky(x, y, ORIGIN);
