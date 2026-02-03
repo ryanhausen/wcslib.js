@@ -101,9 +101,9 @@ Module.onRuntimeInitialized = () => {
     // TEST WCS
     var rd = [53.122781107619, -27.805160455556];
     var check_xy = [22972.5, 27629.5];
-    radec = pixToSky(check_xy,0,0); //some inaccuracy, but conversion OK
+    const radec = pixToSky(check_xy,0,0); //some inaccuracy, but conversion OK
     console.log('Test PixToSky check_xy',check_xy,'ra/dec',radec,'check ra/dec',rd);
-    xy = skyToPix(rd);
+    const xy = skyToPix(rd);
     console.log('Test SkyToPix rd',rd,'xy',xy,'check xy',check_xy);
   }).catch(err => console.log("Error loading FITS header:", err));
 };
