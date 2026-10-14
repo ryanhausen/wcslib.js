@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: emscripten/emsdk:4.0.20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: make
+
+      - name: Determine WCSLIB version
+        id: version
+        run: |
+          js=$(ls build/wcslib-*.js | head -n 1)
+          version="${js##*/wcslib-}"
+          version="${version%.js}"
+          echo "WCSLIB version: $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            build/wcslib-*.js
+            build/wcslib-*.wasm
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v${{ needs.build.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build
+
+      - name: Check for existing release
+        id: exists
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; skipping."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release
+        if: steps.exists.outputs.exists == 'false'
+        run: |
+          args=(
+            --repo "$GITHUB_REPOSITORY"
+            --target "$GITHUB_SHA"
+            --title "WCSLIB ${TAG#v}"
+          )
+
+          # Tag of the most recent existing release (empty if there are none)
+          prev=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName 2>/dev/null || true)
+
+          # Generated changelog if there are commits since that release, default message otherwise
+          if [ -n "$prev" ] && [ "$(git rev-list --count "$prev..$GITHUB_SHA")" -gt 0 ]; then
+            args+=(--generate-notes --notes-start-tag "$prev")
+          else
+            args+=(--notes "WebAssembly build of WCSLIB ${TAG#v}.")
+          fi
+
+          gh release create "$TAG" build/wcslib-*.js build/wcslib-*.wasm "${args[@]}"
